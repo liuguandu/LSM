@@ -1,0 +1,90 @@
+# _BASE_: "../Base-RCNN-FPN.yaml"
+# MODEL:
+#   META_ARCHITECTURE: "TwoStagePseudoLabGeneralizedRCNN"
+#   WEIGHTS: "datasets/pretrained_models/R-50.pkl"
+#   MASK_ON: False
+#   RESNETS:
+#     DEPTH: 50
+#   PROPOSAL_GENERATOR:
+#     NAME: "PseudoLabRPN"
+#   RPN:
+#     POSITIVE_FRACTION: 0.25
+#     LOSS: "CrossEntropy"
+#   ROI_HEADS:
+#     NAME: "StandardROIHeadsPseudoLab"
+#     LOSS: "FocalLoss"
+# SOLVER:
+#   LR_SCHEDULER_NAME: "WarmupTwoStageMultiStepLR"
+#   STEPS: (60000, 80000, 90000, 360000)
+#   FACTOR_LIST: (1, 1, 1, 1, 1)
+#   MAX_ITER: 360000
+#   IMG_PER_BATCH_LABEL: 32
+#   IMG_PER_BATCH_UNLABEL: 32
+#   BASE_LR: 0.01
+#   CHECKPOINT_PERIOD: 5000
+# DATALOADER:
+#   SUP_PERCENT: 100.0
+#   RANDOM_DATA_SEED: 1
+# DATASETS:
+#   CROSS_DATASET: True
+#   TRAIN: ("coco_2017_train",)
+#   TRAIN_LABEL: ("coco_2017_train",)
+#   # TRAIN_UNLABEL: ("coco_2017_unlabel",)
+#   TRAIN_UNLABEL: ("imagenet0.2_rpnData_dynamic",)
+#   TEST: ("coco_2017_val",)
+# SEMISUPNET:
+#   Trainer: "ubteacher"
+#   BBOX_THRESHOLD: 0.7
+#   TEACHER_UPDATE_ITER: 1
+#   BURN_UP_STEP: 20000
+#   EMA_KEEP_RATE: 0.9996
+#   UNSUP_LOSS_WEIGHT: 4.0
+# TEST:
+#   EVAL_PERIOD: 5000
+
+_BASE_: "../Base-RCNN-FPN.yaml"
+MODEL:
+  META_ARCHITECTURE: "TwoStagePseudoLabGeneralizedRCNN"
+  WEIGHTS: "datasets/pretrained_models/R-50.pkl"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 50
+  PROPOSAL_GENERATOR:
+    NAME: "PseudoLabRPN"
+  RPN:
+    POSITIVE_FRACTION: 0.25
+    LOSS: "CrossEntropy"
+  ROI_HEADS:
+    NAME: "StandardROIHeadsPseudoLab"
+    LOSS: "FocalLoss"
+SOLVER:
+  LR_SCHEDULER_NAME: "WarmupMultiStepLR"
+  STEPS: (359990, 359995)
+  MAX_ITER: 360000
+  IMG_PER_BATCH_LABEL: 32
+  IMG_PER_BATCH_UNLABEL: 32
+  BASE_LR: 0.01
+  CHECKPOINT_PERIOD: 5000
+DATALOADER:
+  SUP_PERCENT: 2.0
+  RANDOM_DATA_SEED: 1
+DATASETS:
+  CROSS_DATASET: True
+  # TRAIN: ("coco_2017_train",)
+  TRAIN: ("voc2007",)
+  # TRAIN_LABEL: ("coco_2017_train",)
+  TRAIN_LABEL: ("voc2007",)
+  # TRAIN_UNLABEL: ("coco_2017_unlabel",)
+  # TRAIN_UNLABEL: ("imagenet0.2_rpnData_dynamic",)
+  TRAIN_UNLABEL: ("voc2012",)
+  # TEST: ("coco_2017_val",)
+  TEST: ("voc_test",)
+SEMISUPNET:
+  Trainer: "ubteacher"
+  BBOX_THRESHOLD: 0.7
+  TEACHER_UPDATE_ITER: 1
+  BURN_UP_STEP: 12000
+  EMA_KEEP_RATE: 0.9996
+  UNSUP_LOSS_WEIGHT: 4.0
+TEST:
+  EVAL_PERIOD: 2000
